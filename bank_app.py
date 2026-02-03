@@ -91,4 +91,29 @@ def main():
     m2.metric("Daily Transactions", f"{st.session_state.count} / 3")
     m3.metric("Account Status", "Premium")
 
-    if st.session_state.count >=
+    # Fixed the SyntaxError here by adding the '3'
+    if st.session_state.count >= 3:
+        st.error("Daily limit reached. Please reset in the sidebar.")
+    else:
+        tab1, tab2 = st.tabs(["💰 Deposit", "💸 Withdraw"])
+        with tab1:
+            d_amt = st.number_input("Deposit Amount:", min_value=0, step=100)
+            if st.button("Confirm Deposit"):
+                if d_amt > 0 and d_amt <= 50000 and d_amt % 100 == 0:
+                    st.session_state.balance += d_amt
+                    st.session_state.count += 1
+                    update_db(st.session_state.balance, st.session_state.count)
+                    st.balloons()
+                    st.rerun()
+        with tab2:
+            w_amt = st.number_input("Withdrawal Amount:", min_value=0, step=100)
+            if st.button("Confirm Withdrawal"):
+                if w_amt > 0 and w_amt <= 20000 and w_amt <= st.session_state.balance:
+                    st.session_state.balance -= w_amt
+                    st.session_state.count += 1
+                    update_db(st.session_state.balance, st.session_state.count)
+                    st.snow()
+                    st.rerun()
+
+if __name__ == '__main__':
+    main()
